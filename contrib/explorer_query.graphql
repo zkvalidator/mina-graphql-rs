@@ -13,3 +13,29 @@ query StakingDataExplorer($epoch: Int!) {
     }
   }
 }
+
+query BlocksWon($creator: String!, $epoch: Int!, $limit: Int!) {
+  blocks(limit: $limit, query: {creator: $creator, canonical: true, protocolState: { consensusState: { epoch: $epoch}}}) {
+    blockHeight
+  }
+}
+
+query TransactionsBetweenAddresses($to: String!, $from: String!) {
+  transactions(query: {to: $to, from: $from, canonical: true}) {
+    amount
+  }
+}
+
+query LastBlockInEpoch($epoch: Int!) {
+  blocks(
+    query: {protocolState: {consensusState: {epoch: $epoch}}}
+    sortBy: DATETIME_DESC
+    limit: 1
+  ) {
+    protocolState {
+      consensusState {
+        blockHeight
+      }
+    }
+  }
+}
