@@ -6,6 +6,7 @@ macro_rules! aw {
     };
 }
 
+#[ignore]
 #[test]
 fn test_get_staking_percentages() {
     aw!(async {
@@ -17,6 +18,7 @@ fn test_get_staking_percentages() {
     })
 }
 
+#[ignore]
 #[test]
 fn test_get_blocks_won() {
     aw!(async {
@@ -27,6 +29,7 @@ fn test_get_blocks_won() {
     })
 }
 
+#[ignore]
 #[test]
 fn test_get_expected_payment_for_foundation_addresses_until_max_epoch() {
     aw!(async {
@@ -41,6 +44,7 @@ fn test_get_expected_payment_for_foundation_addresses_until_max_epoch() {
     })
 }
 
+#[ignore]
 #[test]
 fn test_get_expected_payment_for_foundation_addresses() {
     aw!(async {
@@ -55,6 +59,7 @@ fn test_get_expected_payment_for_foundation_addresses() {
     })
 }
 
+#[ignore]
 #[test]
 fn test_verify_enough_payments() {
     aw!(async {

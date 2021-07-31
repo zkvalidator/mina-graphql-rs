@@ -11,4 +11,5 @@ pub use processing::*;
 mod wasm_tests;
 
 #[cfg(test)]
+#[cfg(not(target_arch = "wasm32"))]
 mod tests;
