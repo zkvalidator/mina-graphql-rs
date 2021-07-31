@@ -1,4 +1,7 @@
+use anyhow::{anyhow, Result};
 use graphql_client::*;
+use reqwest::IntoUrl;
+use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 
 type UInt32 = String;
@@ -81,4 +84,21 @@ pub struct LedgerAccount {
     pub balance: String,
     pub delegate: String,
     pub index: i64,
+}
+
+pub async fn graphql_query<U: IntoUrl, B: Serialize + ?Sized, R: DeserializeOwned>(
+    endpoint: U,
+    request_body: &B,
+) -> Result<R> {
+    let client = reqwest::Client::new();
+    let res = client.post(endpoint).json(request_body).send().await?;
+    let response_body: Response<R> = res.json().await?;
+    if let Some(es) = response_body.errors {
+        for e in es {
+            log::error!("{}", e);
+        }
+        return Err(anyhow!("response_body contains errors"));
+    }
+
+    response_body.data.ok_or(anyhow!("response_body was none"))
 }
