@@ -27,9 +27,9 @@ pub struct Delegator {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DelegatorPayment {
-    expected: Decimal,
-    performed: Decimal,
-    diff: Decimal,
+    pub expected: Decimal,
+    pub performed: Decimal,
+    pub diff: Decimal,
 }
 
 pub async fn get_staking_data(
