@@ -41,7 +41,7 @@ jobs:
           override: true
           components: rustfmt
 
-     - name: cargo fmt --check
+      - name: cargo fmt --check
         uses: actions-rs/cargo@v1
         env:
           CARGO_NET_GIT_FETCH_WITH_CLI: true
