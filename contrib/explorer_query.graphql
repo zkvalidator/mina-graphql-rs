@@ -1,0 +1,15 @@
+query StakingDataExplorer($epoch: Int!) {
+  blocks(limit: 1, query: {protocolState: {consensusState: {epoch: $epoch}}, canonical: true}) {
+    protocolState {
+      consensusState {
+        stakingEpochData {
+          seed
+          ledger {
+            hash
+            totalCurrency
+          }
+        }
+      }
+    }
+  }
+}
