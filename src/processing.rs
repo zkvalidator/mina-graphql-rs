@@ -155,7 +155,7 @@ pub async fn get_partial_staking_data_from_mina_explorer(
 
 pub async fn get_delegators(ledger_hash: &str) -> Result<Vec<LedgerAccount>> {
     let url = format!(
-        "https://raw.githubusercontent.com/zkvalidator/mina-graphql-rs/main/data/epochs/{}.json",
+        "https://raw.githubusercontent.com/zkvalidator/mina-graphql-rs/master/data/epochs/{}.json",
         ledger_hash,
     );
 
