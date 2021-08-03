@@ -15,7 +15,7 @@ query StakingDataExplorer($epoch: Int!) {
 }
 
 query EpochBlocksWinners($epoch: Int!) {
-  blocks(limit: 7140, query: {protocolState: {consensusState: {epoch: $epoch}}, canonical: true}) {
+  blocks(limit: 7140, sortBy: BLOCKHEIGHT_ASC, query: {protocolState: {consensusState: {epoch: $epoch}}, canonical: true}) {
     blockHeight
     winnerAccount {
       publicKey
