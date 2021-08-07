@@ -24,6 +24,14 @@ pub struct StakingDataExplorer;
     query_path = "contrib/explorer_query.graphql",
     response_derives = "Debug,Serialize,PartialEq"
 )]
+pub struct EpochBlocksWinners;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "contrib/explorer_regen_schema.graphql",
+    query_path = "contrib/explorer_query.graphql",
+    response_derives = "Debug,Serialize,PartialEq"
+)]
 pub struct BlocksWon;
 
 #[derive(GraphQLQuery)]
