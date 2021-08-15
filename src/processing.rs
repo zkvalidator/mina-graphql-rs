@@ -402,3 +402,20 @@ pub async fn verify_enough_payments(
 
     Ok(payments_diffs)
 }
+
+pub async fn get_epoch_blocks_winners_from_explorer(
+    epoch: i64,
+    // public_key: &str,
+) -> Result<Vec<epoch_blocks_winners::EpochBlocksWinnersBlocks>> {
+    let request_body = EpochBlocksWinners::build_query(epoch_blocks_winners::Variables { epoch });
+    let data: epoch_blocks_winners::ResponseData =
+        graphql_query(MINA_EXPLORER_ENDPOINT, &request_body).await?;
+    let mut blocks = vec![];
+    for b in data.blocks {
+        if b.is_none() {
+            continue;
+        };
+        blocks.push(b.unwrap());
+    }
+    Ok(blocks)
+}
