@@ -405,7 +405,6 @@ pub async fn verify_enough_payments(
 
 pub async fn get_epoch_blocks_winners_from_explorer(
     epoch: i64,
-    // public_key: &str,
 ) -> Result<Vec<epoch_blocks_winners::EpochBlocksWinnersBlocks>> {
     let request_body = EpochBlocksWinners::build_query(epoch_blocks_winners::Variables { epoch });
     let data: epoch_blocks_winners::ResponseData =
@@ -418,4 +417,129 @@ pub async fn get_epoch_blocks_winners_from_explorer(
         blocks.push(b.unwrap());
     }
     Ok(blocks)
+}
+
+pub async fn get_epoch_blocks_for_creator_from_explorer(
+    epoch: i64,
+    public_key: &str,
+) -> Result<Vec<epoch_blocks_for_creator::EpochBlocksForCreatorBlocks>> {
+    let request_body = EpochBlocksForCreator::build_query(epoch_blocks_for_creator::Variables {
+        epoch,
+        creator: public_key.to_string(),
+    });
+    let data: epoch_blocks_for_creator::ResponseData =
+        graphql_query(MINA_EXPLORER_ENDPOINT, &request_body).await?;
+    let mut blocks = vec![];
+    for b in data.blocks {
+        if b.is_none() {
+            continue;
+        };
+        blocks.push(b.unwrap());
+    }
+    Ok(blocks)
+}
+
+#[derive(Default, Serialize, Deserialize, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct BlockResult {
+    pub vrf: String,
+    pub block_height: i64,
+    pub public_key: String,
+}
+
+pub async fn get_winners_for_epoch(epoch: usize) -> Result<HashMap<i64, BlockResult>> {
+    let blocks = get_epoch_blocks_winners_from_explorer(epoch as i64).await?;
+    let mut winner_result: HashMap<i64, BlockResult> = HashMap::new();
+
+    for b in blocks {
+        let consensus_state = b
+            .protocol_state
+            .as_ref()
+            .ok_or(anyhow!("no protocol state"))?
+            .consensus_state
+            .as_ref()
+            .ok_or(anyhow!("no consensus state"))?;
+
+        let slot = consensus_state
+            .slot_since_genesis
+            .ok_or(anyhow!("couldn't get global slot"))?;
+
+        let block_height = consensus_state
+            .block_height
+            .ok_or(anyhow!("couldn't get block height"))?;
+
+        let winner = b
+            .winner_account
+            .as_ref()
+            .ok_or(anyhow!("no winner_account"))?
+            .public_key
+            .as_ref()
+            .ok_or(anyhow!("winner_account no public_key"))?;
+
+        let vrf = consensus_state
+            .last_vrf_output
+            .as_ref()
+            .ok_or(anyhow!("no vrf"))?;
+
+        winner_result.insert(
+            slot,
+            BlockResult {
+                public_key: winner.to_string(),
+                block_height,
+                vrf: vrf.to_string(),
+            },
+        );
+    }
+
+    Ok(winner_result)
+}
+
+pub async fn get_blocks_for_creator_for_epoch(
+    epoch: usize,
+    public_key: &str,
+) -> Result<HashMap<i64, BlockResult>> {
+    let blocks = get_epoch_blocks_for_creator_from_explorer(epoch as i64, public_key).await?;
+    let mut winner_result: HashMap<i64, BlockResult> = HashMap::new();
+
+    for b in blocks {
+        let consensus_state = b
+            .protocol_state
+            .as_ref()
+            .ok_or(anyhow!("no protocol state"))?
+            .consensus_state
+            .as_ref()
+            .ok_or(anyhow!("no consensus state"))?;
+
+        let slot = consensus_state
+            .slot_since_genesis
+            .ok_or(anyhow!("couldn't get global slot"))?;
+
+        let block_height = consensus_state
+            .block_height
+            .ok_or(anyhow!("couldn't get block height"))?;
+
+        let winner = b
+            .winner_account
+            .as_ref()
+            .ok_or(anyhow!("no winner_account"))?
+            .public_key
+            .as_ref()
+            .ok_or(anyhow!("winner_account no public_key"))?;
+
+        let vrf = consensus_state
+            .last_vrf_output
+            .as_ref()
+            .ok_or(anyhow!("no vrf"))?;
+
+        winner_result.insert(
+            slot,
+            BlockResult {
+                public_key: winner.to_string(),
+                block_height,
+                vrf: vrf.to_string(),
+            },
+        );
+    }
+
+    Ok(winner_result)
 }

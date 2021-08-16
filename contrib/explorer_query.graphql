@@ -35,6 +35,28 @@ query EpochBlocksWinners($epoch: Int!) {
   }
 }
 
+query EpochBlocksForCreator($epoch: Int!, $creator: String!) {
+  blocks(limit: 7140, sortBy: BLOCKHEIGHT_ASC, query: {creator: $creator, protocolState: {consensusState: {epoch: $epoch}}}) {
+    blockHeight
+    protocolState {
+      consensusState {
+        blockHeight
+        blockchainLength
+        epoch
+        epochCount
+        lastVrfOutput
+        slot
+        slotSinceGenesis
+        totalCurrency
+      }
+    }
+    winnerAccount {
+      publicKey
+    }
+  }
+}
+
+
 query BlocksWon($creator: String!, $epoch: Int!, $limit: Int!) {
   blocks(limit: $limit, query: {creator: $creator, canonical: true, protocolState: { consensusState: { epoch: $epoch}}}) {
     blockHeight
