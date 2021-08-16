@@ -6,6 +6,7 @@ use serde::Serialize;
 
 type UInt32 = String;
 type UInt64 = String;
+type DateTime = String;
 
 pub const MINA_EXPLORER_ENDPOINT: &str = "https://graphql.minaexplorer.com";
 pub const DEFAULT_LOCAL_ENDPOINT: &str = "http://localhost:3085/graphql";
@@ -25,6 +26,14 @@ pub struct StakingDataExplorer;
     response_derives = "Debug,Serialize,PartialEq"
 )]
 pub struct EpochBlocksWinners;
+
+#[derive(GraphQLQuery)]
+#[graphql(
+    schema_path = "contrib/explorer_regen_schema.graphql",
+    query_path = "contrib/explorer_query.graphql",
+    response_derives = "Debug,Serialize,PartialEq"
+)]
+pub struct EpochBlocksForCreator;
 
 #[derive(GraphQLQuery)]
 #[graphql(

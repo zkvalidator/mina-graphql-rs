@@ -17,11 +17,41 @@ query StakingDataExplorer($epoch: Int!) {
 query EpochBlocksWinners($epoch: Int!) {
   blocks(limit: 7140, sortBy: BLOCKHEIGHT_ASC, query: {protocolState: {consensusState: {epoch: $epoch}}, canonical: true}) {
     blockHeight
+    dateTime
+    receivedTime
+    protocolState {
+      consensusState {
+        epoch
+        lastVrfOutput
+        slot
+        slotSinceGenesis
+      }
+    }
     winnerAccount {
       publicKey
     }
   }
 }
+
+query EpochBlocksForCreator($epoch: Int!, $creator: String!) {
+  blocks(limit: 7140, sortBy: BLOCKHEIGHT_ASC, query: {creator: $creator, protocolState: {consensusState: {epoch: $epoch}}}) {
+    blockHeight
+    dateTime
+    receivedTime
+    protocolState {
+      consensusState {
+        epoch
+        lastVrfOutput
+        slot
+        slotSinceGenesis
+      }
+    }
+    winnerAccount {
+      publicKey
+    }
+  }
+}
+
 
 query BlocksWon($creator: String!, $epoch: Int!, $limit: Int!) {
   blocks(limit: $limit, query: {creator: $creator, canonical: true, protocolState: { consensusState: { epoch: $epoch}}}) {
