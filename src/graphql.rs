@@ -6,6 +6,7 @@ use serde::Serialize;
 
 type UInt32 = String;
 type UInt64 = String;
+type DateTime = String;
 
 pub const MINA_EXPLORER_ENDPOINT: &str = "https://graphql.minaexplorer.com";
 pub const DEFAULT_LOCAL_ENDPOINT: &str = "http://localhost:3085/graphql";

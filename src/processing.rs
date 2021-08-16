@@ -1,6 +1,7 @@
 use crate::consts::*;
 use crate::graphql::*;
 use anyhow::{anyhow, bail, Result};
+use chrono::{DateTime, FixedOffset};
 use graphql_client::GraphQLQuery;
 use rust_decimal::prelude::FromPrimitive;
 use rust_decimal::Decimal;
@@ -439,12 +440,14 @@ pub async fn get_epoch_blocks_for_creator_from_explorer(
     Ok(blocks)
 }
 
-#[derive(Default, Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct BlockResult {
     pub vrf: String,
     pub block_height: i64,
+    pub date_time: DateTime<FixedOffset>,
     pub public_key: String,
+    pub received_time: DateTime<FixedOffset>,
 }
 
 pub async fn get_winners_for_epoch(epoch: usize) -> Result<HashMap<i64, BlockResult>> {
@@ -464,9 +467,12 @@ pub async fn get_winners_for_epoch(epoch: usize) -> Result<HashMap<i64, BlockRes
             .slot_since_genesis
             .ok_or(anyhow!("couldn't get global slot"))?;
 
-        let block_height = consensus_state
-            .block_height
-            .ok_or(anyhow!("couldn't get block height"))?;
+        let block_height = b.block_height.ok_or(anyhow!("couldn't get block height"))?;
+        let date_time =
+            DateTime::parse_from_rfc3339(&b.date_time.ok_or(anyhow!("couldn't get slot time"))?)?;
+        let received_time = DateTime::parse_from_rfc3339(
+            &b.received_time.ok_or(anyhow!("couldn't get received"))?,
+        )?;
 
         let winner = b
             .winner_account
@@ -487,6 +493,8 @@ pub async fn get_winners_for_epoch(epoch: usize) -> Result<HashMap<i64, BlockRes
                 public_key: winner.to_string(),
                 block_height,
                 vrf: vrf.to_string(),
+                date_time,
+                received_time,
             },
         );
     }
@@ -514,9 +522,12 @@ pub async fn get_blocks_for_creator_for_epoch(
             .slot_since_genesis
             .ok_or(anyhow!("couldn't get global slot"))?;
 
-        let block_height = consensus_state
-            .block_height
-            .ok_or(anyhow!("couldn't get block height"))?;
+        let block_height = b.block_height.ok_or(anyhow!("couldn't get block height"))?;
+        let date_time =
+            DateTime::parse_from_rfc3339(&b.date_time.ok_or(anyhow!("couldn't get slot time"))?)?;
+        let received_time = DateTime::parse_from_rfc3339(
+            &b.received_time.ok_or(anyhow!("couldn't get received"))?,
+        )?;
 
         let winner = b
             .winner_account
@@ -537,6 +548,8 @@ pub async fn get_blocks_for_creator_for_epoch(
                 public_key: winner.to_string(),
                 block_height,
                 vrf: vrf.to_string(),
+                date_time,
+                received_time,
             },
         );
     }
